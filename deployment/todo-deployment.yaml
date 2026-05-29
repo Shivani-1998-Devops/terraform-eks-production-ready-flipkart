@@ -17,7 +17,7 @@ spec:
         - name: todoapp-frontend-container
           image: sanketmahajan/todoapp_frontend:2.0.0
           ports:
-            - containerPort: 80
+            - containerPort: 3000
           resources:
             requests:
               cpu: "100m"
@@ -34,7 +34,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /
-              port: 80
+              port: 3000
             initialDelaySeconds: 15
             periodSeconds: 10
 
@@ -50,5 +50,5 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 80
+      targetPort: 3000
   type: ClusterIP
