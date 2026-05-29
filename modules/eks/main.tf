@@ -46,6 +46,7 @@ resource "aws_eks_addon" "eks-addons" {
   cluster_name  = aws_eks_cluster.eks[0].name
   addon_name    = each.value.name
   addon_version = each.value.version
+  service_account_role_arn = module.ebs_csi_irsa.iam_role_arn
 
   depends_on = [
     aws_eks_node_group.ondemand-node,
@@ -125,4 +126,18 @@ resource "aws_eks_node_group" "spot-node" {
   disk_size = 30
 
   depends_on = [aws_eks_cluster.eks]
+}
+module "ebs_csi_irsa" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+
+  role_name = "${var.cluster_name}-ebs-csi-role"
+
+  attach_ebs_csi_policy = true
+
+  oidc_providers = {
+    main = {
+      provider_arn               = aws_iam_openid_connect_provider.eks-oidc.arn
+      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
+    }
+  }
 }
