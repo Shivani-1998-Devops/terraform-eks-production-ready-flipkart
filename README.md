@@ -1,12 +1,6 @@
 # EKS-AWS-Terraform-Module-Project
 
 
-## For more projects, check out  
-[https://harishnshetty.github.io/projects.html](https://harishnshetty.github.io/projects.html)
-
-[![Video Tutorial](https://github.com/harishnshetty/image-data-project/blob/695c5d6cdd52b3dcd21464f716977e1124e394fd/1eksterrafrom.JPG)](https://youtu.be/9sTzMx86vwE)
-
-[![Channel Link](https://github.com/harishnshetty/image-data-project/blob/f4cbae3f8429073cb96264ef402ecbe511db6bc4/2eks.JPG)](https://youtu.be/9sTzMx86vwE)
 
 ## 1. Terraform Installation
 
@@ -121,7 +115,7 @@ aws sts get-caller-identity
 
 ## 6. Terraform Apply
 ```bash
-tf apply -var-file=dev.tfvars -auto-approve
+terraform apply -var-file="./dev.tfvars"
 ```
 
 ## 7. Install EKS Addons version check
@@ -160,7 +154,9 @@ kubectl get svc argocd-server -n argocd -o json | jq --raw-output '.status.loadB
 
 ## 12. get the argocd admin password
 ```bash
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+for cmd
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" > pass.txt
+powershell -Command "[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String((Get-Content pass.txt)))"
 ```
 
 ## 13. get the prometheus admin password
@@ -176,7 +172,11 @@ kubectl get pods -n prometheus -l app.kubernetes.io/name=grafana -o jsonpath='{.
 
 ## 15. reset the prometheus grafana admin password
 ```bash 
-kubectl exec --namespace prometheus -it $(kubectl get pods --namespace prometheus -l app.kubernetes.io/name=grafana -o jsonpath="{.items[0].metadata.name}") -- grafana-cli admin reset-admin-password Abcd@1234
+kubectl get pods -n prometheus -l app.kubernetes.io/name=grafana -o jsonpath="{.items[0].metadata.name}"
+You will get something like:
+
+grafana-7c9d9b6f5c-abc12
+kubectl exec -n prometheus -it grafana-7c9d9b6f5c-abc12 -- grafana-cli admin reset-admin-password Abcd@1234
 ```
 
 ## 16. Delete the Deployments

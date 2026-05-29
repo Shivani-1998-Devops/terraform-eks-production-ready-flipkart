@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todoapp-frontend-deployment
+  namespace: todoapp-ns
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: todoapp-frontend
+  template:
+    metadata:
+      labels:
+        app: todoapp-frontend
+    spec:
+      containers:
+        - name: todoapp-frontend-container
+          image: sanketmahajan/todoapp_frontend:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 10
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todoapp-svc
+  namespace: todoapp-ns
+spec:
+  selector:
+    app: todoapp-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
